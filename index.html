@@ -654,7 +654,7 @@
     const [w, h] = size.split('x').map(Number);
     const seed = Math.floor(Math.random() * 99999);
     const encodedPrompt = encodeURIComponent(fullPrompt);
-    const imgUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${w}&height=${h}&seed=${seed}&nologo=true`;
+    const imgUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?t=${Date.now()}`;
 
     setGenerating(true, 'Generating gambar...');
     log(`Generating: "${fullPrompt.slice(0,60)}..."`, 'info');
@@ -664,7 +664,7 @@
       await new Promise((resolve, reject) => {
         const img = document.getElementById('previewImg');
         img.onload = resolve;
-        img.onerror = reject;
+        img.onerror = () => reject(new Error("Image gagal load"));
         img.src = imgUrl;
       });
 
