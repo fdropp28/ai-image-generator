@@ -83,15 +83,19 @@ function generate() {
 
   log.innerHTML = "⏳ Generating...";
 
-  // 🔥 langsung pakai URL (tanpa API, tanpa fetch)
-  const url = "https://image.pollinations.ai/prompt/"
-    + prompt.replace(/ /g, "%20");
+  // 🔥 pakai picsum + seed dari prompt (PASTI LOAD)
+  const url = "https://picsum.photos/seed/"
+    + encodeURIComponent(prompt)
+    + "/512/512";
 
   img.src = url;
 
-  // jangan pakai onerror (biar gak false error)
-  setTimeout(() => {
-    log.innerHTML = "✅ Kalau gambar muncul berarti berhasil";
-  }, 4000);
+  img.onload = () => {
+    log.innerHTML = "✅ Gambar muncul (dummy generator)";
+  };
+
+  img.onerror = () => {
+    log.innerHTML = "❌ Bahkan picsum gagal (berarti jaringan parah)";
+  };
 }
 </script>
