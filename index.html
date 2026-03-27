@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Image Generator</title>
+<title>AI Image Generator PRO</title>
 
 <style>
 body {
@@ -13,25 +13,34 @@ body {
   text-align:center;
   padding:20px;
 }
-input, textarea, button {
+h1 {
+  font-size:28px;
+}
+input, textarea, button, select {
   width:90%;
   margin:10px;
-  padding:10px;
-  border-radius:8px;
+  padding:12px;
+  border-radius:10px;
   border:none;
+  font-size:14px;
 }
+textarea { height:100px; }
+
 button {
   background:linear-gradient(45deg,#7c5cfc,#fc5c7d);
   color:white;
   font-weight:bold;
+  cursor:pointer;
 }
+
 img {
   max-width:90%;
   margin-top:20px;
-  border-radius:10px;
+  border-radius:12px;
 }
+
 #log {
-  margin-top:20px;
+  margin-top:15px;
   font-size:12px;
   color:#aaa;
 }
@@ -40,60 +49,41 @@ img {
 
 <body>
 
-<h1>🔥 AI Image Generator</h1>
+<h1>🔥 AI Image Generator PRO</h1>
 
 <input id="filename" placeholder="Nama file (opsional)">
-<textarea id="prompt" placeholder="Contoh: naga api di gunung berapi"></textarea>
 
-<button onclick="generate()">Generate</button>
+<textarea id="prompt" placeholder="Contoh: ketan hitam"></textarea>
+
+<select id="style">
+  <option value="">-- Pilih Style --</option>
+  <option value="ultra realistic, 4k, highly detailed">Realistic</option>
+  <option value="anime style, vibrant colors">Anime</option>
+  <option value="cinematic lighting, dramatic shadows">Cinematic</option>
+  <option value="digital art, concept art">Digital Art</option>
+</select>
+
+<button onclick="generate()">✨ Generate</button>
 
 <br>
 <img id="img">
+
 <div id="log"></div>
 
 <script>
+
 let currentUrl = "";
 
 function log(msg) {
-  document.getElementById("log").innerHTML += "<div>"+msg+"</div>";
+  document.getElementById("log").innerHTML = msg;
+}
+
+// 🔥 AUTO ENHANCE PROMPT
+function enhancePrompt(prompt, style) {
+  return prompt + ", " + style + ", ultra detailed, 8k, masterpiece";
 }
 
 function generate() {
   const prompt = document.getElementById("prompt").value.trim();
-  const filename = document.getElementById("filename").value || "ai-image";
-  const img = document.getElementById("img");
-
-  if(!prompt){
-    log("❌ Masukkan prompt dulu");
-    return;
-  }
-
-  log("⏳ Generating...");
-
-  // 🔥 FIX UTAMA (URL SIMPLE & STABIL)
-  const cleanPrompt = prompt.replace(/ /g,"%20");
-  const url = "https://image.pollinations.ai/prompt/" 
-              + cleanPrompt 
-              + "?t=" + Date.now();
-
-  img.onload = () => {
-    log("✅ Berhasil!");
-    currentUrl = url;
-
-    // auto download
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename + ".png";
-    a.click();
-  };
-
-  img.onerror = () => {
-    log("❌ Gagal generate (API error / koneksi)");
-  };
-
-  img.src = url;
-}
-</script>
-
-</body>
-</html>
+  const style = document.getElementById("style").value;
+  const filename = document.getElementById("filename").value || "ai
