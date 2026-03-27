@@ -71,19 +71,48 @@ img {
 <div id="log"></div>
 
 <script>
-
-let currentUrl = "";
-
-function log(msg) {
-  document.getElementById("log").innerHTML = msg;
-}
-
-// 🔥 AUTO ENHANCE PROMPT
-function enhancePrompt(prompt, style) {
-  return prompt + ", " + style + ", ultra detailed, 8k, masterpiece";
-}
-
 function generate() {
-  const prompt = document.getElementById("prompt").value.trim();
-  const style = document.getElementById("style").value;
-  const filename = document.getElementById("filename").value || "ai
+  try {
+    const promptEl = document.getElementById("prompt");
+    const img = document.getElementById("img");
+    const log = document.getElementById("log");
+
+    if (!promptEl || !img || !log) {
+      alert("❌ ERROR: Elemen tidak ditemukan!");
+      return;
+    }
+
+    const style = document.getElementById("style").value;
+let prompt = promptEl.value.trim();
+
+if (style) {
+  prompt += ", " + style;
+}
+
+    if (!prompt) {
+      log.innerHTML = "❌ Masukkan prompt dulu";
+      return;
+    }
+
+    log.innerHTML = "⏳ Generating...<br><small>" + prompt + "</small>";
+    const url = "https://image.pollinations.ai/prompt/"
+  + encodeURIComponent(prompt)
+  + "?t=" + Date.now();
+
+    console.log("URL:", url);
+
+    img.onload = () => {
+      log.innerHTML = "✅ Berhasil!";
+    };
+
+    img.onerror = () => {
+      log.innerHTML = "❌ Gagal load gambar";
+    };
+
+    img.src = url;
+
+  } catch (err) {
+    alert("ERROR: " + err.message);
+  }
+}
+                       </script>
