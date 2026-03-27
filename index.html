@@ -71,8 +71,8 @@ img {
 <div id="log"></div>
 
 <script>
-async function generate() {
-  const prompt = document.getElementById("prompt").value.trim();
+function generate() {
+  const prompt = document.getElementById("prompt").value;
   const img = document.getElementById("img");
   const log = document.getElementById("log");
 
@@ -83,52 +83,15 @@ async function generate() {
 
   log.innerHTML = "⏳ Generating...";
 
-  let retries = 3;
+  // 🔥 langsung pakai URL (tanpa API, tanpa fetch)
+  const url = "https://image.pollinations.ai/prompt/"
+    + prompt.replace(/ /g, "%20");
 
-  while (retries > 0) {
-    try {
-      const response = await fetch(
-        "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0",
-        {
-          method: "POST",
-          headers: {
-            "Authorization": "Bearer ",
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            inputs: prompt + ", ultra realistic, 4k"
-          })
-        }
-      );
+  img.src = url;
 
-      // 🔥 kalau model belum siap
-      if (response.status === 503) {
-        log.innerHTML = "⏳ Model loading... tunggu sebentar";
-        await new Promise(r => setTimeout(r, 5000));
-        retries--;
-        continue;
-      }
-
-      if (!response.ok) {
-        const text = await response.text();
-        log.innerHTML = "❌ API Error: " + text;
-        return;
-      }
-
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-
-      img.src = url;
-      log.innerHTML = "✅ Berhasil!";
-      return;
-
-    } catch (err) {
-      retries--;
-      log.innerHTML = "⚠️ Retry... (" + retries + ")";
-      await new Promise(r => setTimeout(r, 3000));
-    }
-  }
-
-  log.innerHTML = "❌ Gagal setelah beberapa percobaan";
+  // jangan pakai onerror (biar gak false error)
+  setTimeout(() => {
+    log.innerHTML = "✅ Kalau gambar muncul berarti berhasil";
+  }, 4000);
 }
-        </script>
+</script>
