@@ -71,48 +71,64 @@ img {
 <div id="log"></div>
 
 <script>
-function generate() {
-  try {
-    const promptEl = document.getElementById("prompt");
-    const img = document.getElementById("img");
-    const log = document.getElementById("log");
+async function generate() {
+  const prompt = document.getElementById("prompt").value.trim();
+  const img = document.getElementById("img");
+  const log = document.getElementById("log");
 
-    if (!promptEl || !img || !log) {
-      alert("❌ ERROR: Elemen tidak ditemukan!");
-      return;
-    }
-
-    const style = document.getElementById("style").value;
-let prompt = promptEl.value.trim();
-
-if (style) {
-  prompt += ", " + style;
-}
-
-    if (!prompt) {
-      log.innerHTML = "❌ Masukkan prompt dulu";
-      return;
-    }
-
-    log.innerHTML = "⏳ Generating...<br><small>" + prompt + "</small>";
-    const url = "https://image.pollinations.ai/prompt/"
-  + encodeURIComponent(prompt)
-  + "?t=" + Date.now();
-
-    console.log("URL:", url);
-
-    img.onload = () => {
-      log.innerHTML = "✅ Berhasil!";
-    };
-
-    img.onerror = () => {
-      log.innerHTML = "❌ Gagal load gambar";
-    };
-
-    img.src = url;
-
-  } catch (err) {
-    alert("ERROR: " + err.message);
+  if (!prompt) {
+    log.innerHTML = "❌ Masukkan prompt dulu";
+    return;
   }
+
+  log.innerHTML = "⏳ Generating...";
+
+  let retries = 3;
+
+  while (retries > 0) {
+    try {
+      const response = await fetch(
+        "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0",
+        {
+          method: "POST",
+          headers: {
+            "Authorization": "Bearer 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",
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            inputs: prompt + ", ultra realistic, 4k"
+          })
+        }
+      );
+
+      // 🔥 kalau model belum siap
+      if (response.status === 503) {
+        log.innerHTML = "⏳ Model loading... tunggu sebentar";
+        await new Promise(r => setTimeout(r, 5000));
+        retries--;
+        continue;
+      }
+
+      if (!response.ok) {
+        const text = await response.text();
+        log.innerHTML = "❌ API Error: " + text;
+        return;
+      }
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+
+      img.src = url;
+      log.innerHTML = "✅ Berhasil!";
+      return;
+
+    } catch (err) {
+      retries--;
+      log.innerHTML = "⚠️ Retry... (" + retries + ")";
+      await new Promise(r => setTimeout(r, 3000));
+    }
+  }
+
+  log.innerHTML = "❌ Gagal setelah beberapa percobaan";
 }
-                       </script>
+        </script>
